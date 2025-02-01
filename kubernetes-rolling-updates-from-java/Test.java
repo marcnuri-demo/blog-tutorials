@@ -2,7 +2,7 @@
 //JAVA 21+
 //DEPS io.fabric8:kubernetes-client:7.0.1
 //DEPS io.fabric8:kube-api-test:7.0.1
-//DEPS org.assertj:assertj-core:3.27.2
+//DEPS org.assertj:assertj-core:3.27.3
 //SOURCES ./DeployNginx.java
 //SOURCES ./PauseNginx.java
 //SOURCES ./ResumeNginx.java
