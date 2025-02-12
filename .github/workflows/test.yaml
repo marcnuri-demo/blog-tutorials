@@ -22,4 +22,5 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Tests
         run: |
+          jbang ./kubernetes-patching-resources-from-java/Test.java
           jbang ./kubernetes-rolling-updates-from-java/Test.java
