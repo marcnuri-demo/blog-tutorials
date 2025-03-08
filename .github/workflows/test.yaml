@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,9 +18,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Tests
         run: |
+          jbang ./connecting-to-mcp-server-with-langchain4j/LangChainMcpClient.java
           jbang ./kubernetes-patching-resources-from-java/Test.java
           jbang ./kubernetes-rolling-updates-from-java/Test.java
