@@ -21,9 +21,9 @@ import java.time.Duration;
 import java.util.Arrays;
 
 // Run with the following command
-// GITHUB_TOKEN=ghp_YOUR_TOKEN jbang ./work-in-progress/LangChainMcpClient.java
-// Or with the following command to start the assistant integration example
-// GITHUB_TOKEN=ghp_YOUR_TOKEN jbang ./work-in-progress/LangChainMcpClient.java --assistant
+// GITHUB_TOKEN=ghp_YOUR_TOKEN jbang ./LangChainMcpClient.java
+// Or with the following command to start the assistant integration example (you need a Kubernetes cluster .kube/context)
+// GITHUB_TOKEN=ghp_YOUR_TOKEN jbang ./LangChainMcpClient.java --assistant
 public final class LangChainMcpClient {
 
   private static final String NPX = System.getProperty("os.name").toLowerCase().contains("win") ? "npx.cmd" : "npx";
@@ -74,8 +74,8 @@ public final class LangChainMcpClient {
   public static void main(String[] args) {
     try {
       checkRequirements();
-      System.out.println("Starting podman-mcp-server in STDIO mode...");
-      try (var stdioClient = initStdioClient(NPX, "-y", "podman-mcp-server@latest")) {
+      System.out.println("Starting kubernetes-mcp-server in STDIO mode...");
+      try (var stdioClient = initStdioClient(NPX, "-y", "kubernetes-mcp-server@latest")) {
         System.out.println("Available tools:");
         stdioClient.listTools().stream()
           .map(t -> " - " + t.name())
@@ -84,9 +84,9 @@ public final class LangChainMcpClient {
           assistantIntegrationExample(stdioClient);
         }
       }
-      System.out.println("Starting podman-mcp-server in SSE mode...");
+      System.out.println("Starting kubernetes-mcp-server in SSE mode...");
       // Start the MCP server in a separate process
-      final var process = new ProcessBuilder(NPX, "-y", "podman-mcp-server@latest", "--sse-port=8080")
+      final var process = new ProcessBuilder(NPX, "-y", "kubernetes-mcp-server@latest", "--sse-port=8080")
         .inheritIO()
         .start();
       waitForPort("localhost", 8080, Duration.ofSeconds(10));
@@ -121,8 +121,8 @@ public final class LangChainMcpClient {
         .build())
       .toolProvider(McpToolProvider.builder().mcpClients(client).build())
       .build();
-    System.out.println(assistant.chat("Start a container with the image marcnuri/chuck-norris"));
-    System.out.println(assistant.chat("List my running containers as a markdown table"));
+    System.out.println(assistant.chat("Run a Pod with the image marcnuri/chuck-norris and expose port 8080"));
+    System.out.println(assistant.chat("List the Pods running in my cluster as a markdown table"));
   }
 
   private static void checkRequirements() {

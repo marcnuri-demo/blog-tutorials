@@ -18,12 +18,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      # Required for the MCP server examples
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
       - name: Tests
         run: |
           jbang ./connecting-to-mcp-server-with-langchain4j/LangChainMcpClient.java
