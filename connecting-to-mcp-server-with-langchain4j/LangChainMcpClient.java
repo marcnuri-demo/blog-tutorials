@@ -81,7 +81,9 @@ public final class LangChainMcpClient {
           .map(t -> " - " + t.name())
           .forEach(System.out::println);
         if (args.length > 0 && args[0].equals("--assistant")) {
-          assistantIntegrationExample(stdioClient);
+          final var assistant = assistantIntegrationExample(stdioClient);
+          System.out.println(assistant.chat("Run a Pod with the image marcnuri/chuck-norris and expose port 8080"));
+          System.out.println(assistant.chat("List the Pods running in my cluster as a markdown table"));
         }
       }
       System.out.println("Starting kubernetes-mcp-server in SSE mode...");
@@ -107,8 +109,8 @@ public final class LangChainMcpClient {
     String chat(String userMessage);
   }
 
-  private static void assistantIntegrationExample(McpClient client) {
-    final var assistant = AiServices.builder(Assistant.class)
+  private static Assistant assistantIntegrationExample(McpClient client) {
+    return AiServices.builder(Assistant.class)
       // A bug in Google's API server prevents the use of the GoogleAiGeminiChatModel with tools
       // --* GenerateContentRequest.tools[0].function_declarations[0].parameters.properties[params].properties: should be non-empty for OBJECT type--
 //      .chatLanguageModel(GoogleAiGeminiChatModel.builder()
@@ -121,8 +123,6 @@ public final class LangChainMcpClient {
         .build())
       .toolProvider(McpToolProvider.builder().mcpClients(client).build())
       .build();
-    System.out.println(assistant.chat("Run a Pod with the image marcnuri/chuck-norris and expose port 8080"));
-    System.out.println(assistant.chat("List the Pods running in my cluster as a markdown table"));
   }
 
   private static void checkRequirements() {

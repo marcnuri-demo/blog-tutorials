@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Setup Minikube
+      - name: Setup Minikube # TODO: Remove once the MCP server is improved to allow for a no-kube-config setup
         uses: manusa/actions-setup-minikube@v2.13.1
         with:
           minikube version: 'v1.35.0'
