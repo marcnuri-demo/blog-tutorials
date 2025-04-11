@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import {createReactAgent} from '@langchain/langgraph/prebuilt';
 import {ChatOpenAI} from '@langchain/openai';
 import {loadMcpTools} from '@langchain/mcp-adapters';
