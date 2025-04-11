@@ -1,0 +1,15 @@
+{
+  "name": "ai-sdk-example",
+  "version": "0.0.0",
+  "homepage": "https://github.com/marcnuri-demo/blog-tutorials",
+  "licenese": "Apache-2.0",
+  "main": "./index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "1.2.10",
+    "ai": "4.3.4"
+  }
+}
