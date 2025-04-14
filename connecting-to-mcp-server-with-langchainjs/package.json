@@ -12,7 +12,7 @@
     "@langchain/mcp-adapters": "0.4.0",
     "@langchain/core": "0.3.44",
     "@langchain/langgraph": "0.2.63",
-    "@langchain/openai": "0.5.4",
+    "@langchain/openai": "0.5.5",
     "@modelcontextprotocol/sdk": "1.9.0"
   }
 }
