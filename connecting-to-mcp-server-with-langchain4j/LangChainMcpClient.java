@@ -1,6 +1,6 @@
 /// usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 21+
-//DEPS dev.langchain4j:langchain4j-mcp:1.0.0-beta2
+//DEPS dev.langchain4j:langchain4j-mcp:1.0.0-beta3
 //DEPS dev.langchain4j:langchain4j-google-ai-gemini:1.0.0-beta2
 //DEPS dev.langchain4j:langchain4j-github-models:1.0.0-beta3
 //DEPS org.slf4j:slf4j-simple:2.0.17
