@@ -19,11 +19,13 @@ const assistant = async () => {
   });
   const stdioClient = await createMcpClient({name: 'blog.marcnuri.com', transport});
   try {
-    // Model running locally with Podman Desktop AI Lab
+    // Model running locally with Ollama
+    // ollama run granite3.2:8b
+    // OLLAMA_LOAD_TIMEOUT=600 OLLAMA_HOST=0.0.0.0 OLLAMA_CONTEXT_LENGTH=16384 ollama start
     const localGranite = createOpenAICompatible({
-      baseURL: 'http://localhost:3000/'
+      baseURL: 'http://localhost:11434/v1', // MacBook Ollama
     });
-    const model = localGranite('ibm-granite/granite-3.2-8b-instruct');
+    const model = localGranite('granite3.2:8b');
     const tools = await stdioClient.tools();
     // const systemPrompt = 'You are a helpful AI assistant.';
     const systemPrompt =
