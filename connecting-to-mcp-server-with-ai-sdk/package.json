@@ -6,7 +6,7 @@
   "main": "./index.mjs",
   "type": "module",
   "scripts": {
-    "start": "node index.mjs"
+    "start": "bun run index.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "1.2.21",
