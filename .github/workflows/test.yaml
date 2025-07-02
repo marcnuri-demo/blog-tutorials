@@ -21,10 +21,10 @@ jobs:
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       # Required for the MCP server examples
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
+          bun-version: 'latest'
       - name: Setup Minikube # TODO: Remove once the MCP server is improved to allow for a no-kube-config setup
         uses: manusa/actions-setup-minikube@v2.14.0
         with:
@@ -36,5 +36,5 @@ jobs:
           jbang ./connecting-to-mcp-server-with-langchain4j/LangChainMcpClient.java
           jbang ./kubernetes-patching-resources-from-java/Test.java
           jbang ./kubernetes-rolling-updates-from-java/Test.java
-          cd connecting-to-mcp-server-with-langchainjs && npm install && npm start && cd -
+          cd connecting-to-mcp-server-with-langchainjs && bun install && bun run start && cd -
           
