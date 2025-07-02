@@ -1,7 +1,8 @@
 import express from 'express';
-import {McpServer, ResourceTemplate} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import {z} from 'zod';
 
 const SERVER_NAME = 'devbcn-2025-mcp-server';
 const RESOURCE_PREFIX = 'devbcn://2025/';
@@ -25,7 +26,24 @@ server.registerResource(
   async (uri) => ({
     contents: [{
       uri: uri.href,
-      text: await fetch(` https://sessionize.com/api/v2/${SESSIONIZE_ID}/view/Speakers`).then(res => res.text()),
+      text: await fetch(`https://sessionize.com/api/v2/${SESSIONIZE_ID}/view/Speakers`).then(res => res.text()),
+    }]
+  })
+);
+
+server.registerPrompt('devbcn-2025-speaker',
+  {
+    title: 'DevBcn 2025 Speaker',
+    description: 'Get information about a specific speaker for DevBcn (Formerly JBCNConf) 2025',
+    argsSchema: {name: z.string()}
+  },
+  ({name}) => ({
+    messages: [{
+      role: 'user',
+      content: {
+        type: 'text',
+        text: `Get me the bio of the DevBcn 2025 speaker named "${name}".`
+      }
     }]
   })
 );
@@ -40,7 +58,7 @@ server.registerResource(
   async (uri) => ({
     contents: [{
       uri: uri.href,
-      text: await fetch(` https://sessionize.com/api/v2/${SESSIONIZE_ID}/view/Sessions`).then(res => res.text()),
+      text: await fetch(`https://sessionize.com/api/v2/${SESSIONIZE_ID}/view/Sessions`).then(res => res.text()),
     }]
   })
 );
@@ -55,7 +73,7 @@ server.registerResource(
   async (uri) => ({
     contents: [{
       uri: uri.href,
-      text: await fetch(` https://sessionize.com/api/v2/${SESSIONIZE_ID}/view/GridSmart`).then(res => res.text()),
+      text: await fetch(`https://sessionize.com/api/v2/${SESSIONIZE_ID}/view/GridSmart`).then(res => res.text()),
     }]
   })
 );
