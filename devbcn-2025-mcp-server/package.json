@@ -1,11 +1,11 @@
 {
-  "name": "devbcn-2025-mcp-server",
+  "name": "devbcn-mcp-server",
   "version": "0.0.0",
   "homepage": "https://github.com/marcnuri-demo/blog-tutorials",
   "licenese": "Apache-2.0",
   "main": "./dist/index.js",
   "bin": {
-    "kubernetes-mcp-server": "./dist/index.js"
+    "devbcn-mcp-server": "./dist/index.js"
   },
   "type": "module",
   "scripts": {
