@@ -6,7 +6,7 @@ import {z} from 'zod';
 
 const SERVER_NAME = 'devbcn-2025-mcp-server';
 const RESOURCE_PREFIX = 'devbcn://2025/';
-const HTTP_PORT = 3000; // Set to 0 to use a random port
+const HTTP_PORT = 0; // Set to 0 to use a random port
 
 const SESSIONIZE_ID = 'kdiixcgx';
 
