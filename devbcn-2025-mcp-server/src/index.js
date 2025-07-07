@@ -42,7 +42,9 @@ server.registerPrompt('devbcn-2025-speaker',
       role: 'user',
       content: {
         type: 'text',
-        text: `Get me the bio of the DevBcn 2025 speaker named "${name}".`
+        text: `Show me the biography of the DevBcn 2025 speaker named "${name}"` +
+               'Include a list of their sessions.' +
+               'Format in a legible way using just ascii.'
       }
     }]
   })
