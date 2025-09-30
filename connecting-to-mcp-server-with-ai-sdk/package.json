@@ -10,6 +10,6 @@
   },
   "dependencies": {
     "@ai-sdk/google": "2.0.14",
-    "ai": "5.0.9"
+    "ai": "5.0.59"
   }
 }
