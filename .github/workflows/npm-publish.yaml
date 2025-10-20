@@ -5,8 +5,9 @@ on:
     branches:
       - main
 
-env:
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+permissions:
+  contents: read
+  id-token: write  # Required for npmjs OIDC
 
 jobs:
   publish-npm:
@@ -25,12 +26,10 @@ jobs:
       - name: Publish
         working-directory: ./${{ matrix.project }}
         run: |
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
           sed -i "s/\"version\": \".*\"/\"version\": \"0.0.0-$(date +%Y%m%d%H%M)\"/" package.json
           bun install
           bun run build
           echo '#!/usr/bin/env node' | cat - dist/index.js > dist/index.js.tmp && mv dist/index.js.tmp dist/index.js
           chmod +x dist/index.js
-          bun publish
-
-          
+          bun install -g npm@latest # Latest npm version is required for OIDC support
+          npm publish --tag latest
