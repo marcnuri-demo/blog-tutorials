@@ -9,7 +9,7 @@
     "start": "node index.mjs"
   },
   "dependencies": {
-    "@ai-sdk/openai-compatible": "1.0.24",
+    "@ai-sdk/openai-compatible": "1.0.26",
     "@ai-sdk/openai": "2.0.62",
     "ai": "5.0.76"
   }
