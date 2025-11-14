@@ -13,6 +13,6 @@
     "@langchain/core": "1.0.5",
     "@langchain/langgraph": "1.0.2",
     "@langchain/openai": "1.1.1",
-    "@modelcontextprotocol/sdk": "1.21.1"
+    "@modelcontextprotocol/sdk": "1.22.0"
   }
 }
