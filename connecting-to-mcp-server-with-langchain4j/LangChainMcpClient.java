@@ -1,17 +1,17 @@
 /// usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 21+
-//DEPS dev.langchain4j:langchain4j-mcp:1.0.0-beta5
+//DEPS dev.langchain4j:langchain4j-mcp:1.10.0-beta18
 //DEPS dev.langchain4j:langchain4j-google-ai-gemini:1.10.0
-//DEPS dev.langchain4j:langchain4j-github-models:1.0.0-beta5
+//DEPS dev.langchain4j:langchain4j-github-models:1.10.0-beta18
 //DEPS org.slf4j:slf4j-simple:2.0.17
 //FILES ./simplelogger.properties
 
 import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.McpClient;
-import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
+import dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport;
 import dev.langchain4j.mcp.client.transport.stdio.StdioMcpTransport;
-import dev.langchain4j.model.github.GitHubModelsChatModel;
+import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.service.AiServices;
 
 import java.io.IOException;
@@ -32,8 +32,8 @@ public final class LangChainMcpClient {
     return new DefaultMcpClient.Builder()
       // Optional client name to identify with the server, defaults to "langchain4j"
       .clientName("blog.marcnuri.com")
-      // Optional MCP Protocol version, defaults to 2024-11-05
-      .protocolVersion("2024-11-05")
+      // Optional MCP Protocol version, defaults to 2025-11-25
+      .protocolVersion("2025-11-25")
       // Optional timeout for each individual tool execution, defaults to 60 seconds
       .toolExecutionTimeout(Duration.ofSeconds(10))
       // STDIO transport
@@ -47,20 +47,18 @@ public final class LangChainMcpClient {
       .build();
   }
 
-  private static McpClient initSseClient(String sseUrl) {
+  private static McpClient initHttpClient(String httpUrl) {
     return new DefaultMcpClient.Builder()
       // Optional client name to identify with the server, defaults to "langchain4j"
       .clientName("blog.marcnuri.com")
-      // Optional MCP Protocol version, defaults to 2024-11-05
-      .protocolVersion("2024-11-05")
+      // Optional MCP Protocol version, defaults to 2025-11-25
+      .protocolVersion("2025-11-25")
       // Optional timeout for each individual tool execution, defaults to 60 seconds
       .toolExecutionTimeout(Duration.ofSeconds(10))
-      // SSE transport
-      .transport(new HttpMcpTransport.Builder()
+      // Streamable HTTP transport (replaces deprecated SSE transport)
+      .transport(new StreamableHttpMcpTransport.Builder()
         // The URL to connect to the MCP server
-        .sseUrl(sseUrl)
-        // Optional HTTP connect, read, and write timeouts, defaults to 60 seconds
-        .timeout(Duration.ofSeconds(10))
+        .url(httpUrl)
         // Optional, should the MCP server requests be logged to the logger
         // Check simplelogger.properties to enable output to the console
         .logRequests(true)
@@ -86,15 +84,15 @@ public final class LangChainMcpClient {
           System.out.println(assistant.chat("List the Pods running in my cluster as a markdown table"));
         }
       }
-      System.out.println("Starting kubernetes-mcp-server in SSE mode...");
+      System.out.println("Starting kubernetes-mcp-server in HTTP mode...");
       // Start the MCP server in a separate process
-      final var process = new ProcessBuilder(NPX, "-y", "kubernetes-mcp-server@latest", "--sse-port=8080")
+      final var process = new ProcessBuilder(NPX, "-y", "kubernetes-mcp-server@latest", "--port=8080")
         .inheritIO()
         .start();
       waitForPort("localhost", 8080, Duration.ofSeconds(10));
-      try (var stdioClient = initSseClient("http://localhost:8080/sse")) {
+      try (var httpClient = initHttpClient("http://localhost:8080/mcp")) {
         System.out.println("Available tools:");
-        stdioClient.listTools().stream()
+        httpClient.listTools().stream()
           .map(t -> " - " + t.name())
           .forEach(System.out::println);
       } finally {
@@ -113,14 +111,14 @@ public final class LangChainMcpClient {
     return AiServices.builder(Assistant.class)
       // A bug in Google's API server prevents the use of the GoogleAiGeminiChatModel with tools
       // --* GenerateContentRequest.tools[0].function_declarations[0].parameters.properties[params].properties: should be non-empty for OBJECT type--
-//      .chatLanguageModel(GoogleAiGeminiChatModel.builder()
-//        .apiKey(System.getenv("GOOGLE_API_KEY"))
-//        .modelName("gemini-1.5-flash")
-//        .build())
-      .chatModel(GitHubModelsChatModel.builder()
-        .gitHubToken(System.getenv("GITHUB_TOKEN"))
-        .modelName("gpt-4o-mini")
+      .chatModel(GoogleAiGeminiChatModel.builder()
+        .apiKey(System.getenv("GOOGLE_API_KEY"))
+        .modelName("gemini-2.5-flash")
         .build())
+//      .chatModel(GitHubModelsChatModel.builder()
+//        .gitHubToken(System.getenv("GITHUB_TOKEN"))
+//        .modelName("gpt-4o-mini")
+//        .build())
       .toolProvider(McpToolProvider.builder().mcpClients(client).build())
       .build();
   }
