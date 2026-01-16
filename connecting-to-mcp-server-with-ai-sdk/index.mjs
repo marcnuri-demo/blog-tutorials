@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {generateText} from 'ai';
+import {generateText, stepCountIs} from 'ai';
 import {createMCPClient} from '@ai-sdk/mcp';
 import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 import {createGoogleGenerativeAI} from '@ai-sdk/google';
@@ -38,7 +38,7 @@ const assistant = async () => {
     const listPods = await generateText({
       model,
       tools,
-      maxSteps: 10,
+      stopWhen: stepCountIs(10),
       messages: [{
         role: 'user',
         content: 'List all pods in my cluster and output as markdown table'
