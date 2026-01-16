@@ -1,11 +1,7 @@
 #!/usr/bin/env node
-import {
-  generateText,
-  experimental_createMCPClient as createMcpClient
-} from 'ai';
-import {
-  Experimental_StdioMCPTransport as StdioClientTransport
-} from 'ai/mcp-stdio';
+import {generateText} from 'ai';
+import {createMCPClient} from '@ai-sdk/mcp';
+import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 import {createGoogleGenerativeAI} from '@ai-sdk/google';
 
 const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
@@ -15,15 +11,15 @@ const initStdioClient = async () => {
     command: npx,
     args: ['-y', 'kubernetes-mcp-server@latest']
   });
-  return createMcpClient({name: 'blog.marcnuri.com', transport});
+  return createMCPClient({name: 'blog.marcnuri.com', transport});
 };
 
-const initSseClient = async () => {
-  return createMcpClient({
+const initHttpClient = async () => {
+  return createMCPClient({
     name: 'blog.marcnuri.com',
     transport: {
-      type: 'sse',
-      url: `http://localhost:8080/sse`
+      type: 'http',
+      url: 'http://localhost:8080/mcp'
     }
   });
 };
@@ -38,7 +34,7 @@ const assistant = async () => {
     const google = createGoogleGenerativeAI({
       apiKey: process.env['GOOGLE_API_KEY']
     });
-    const model = google('gemini-2.0-flash');
+    const model = google('gemini-2.5-flash');
     const listPods = await generateText({
       model,
       tools,
