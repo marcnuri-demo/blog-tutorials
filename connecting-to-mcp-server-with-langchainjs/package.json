@@ -11,8 +11,8 @@
   "dependencies": {
     "@langchain/mcp-adapters": "1.1.1",
     "@langchain/core": "1.1.15",
-    "@langchain/langgraph": "1.0.15",
-    "@langchain/openai": "1.2.2",
-    "@modelcontextprotocol/sdk": "1.25.2"
+    "@langchain/google-genai": "2.1.10",
+    "@modelcontextprotocol/sdk": "1.25.2",
+    "langchain": "1.1.0"
   }
 }

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import {createReactAgent} from '@langchain/langgraph/prebuilt';
-import {ChatOpenAI} from '@langchain/openai';
+import {createAgent} from 'langchain';
+import {ChatGoogleGenerativeAI} from '@langchain/google-genai';
 import {loadMcpTools} from '@langchain/mcp-adapters';
 import {Client} from '@modelcontextprotocol/sdk/client/index.js';
-import {SSEClientTransport} from '@modelcontextprotocol/sdk/client/sse.js';
+import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 
 const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
@@ -20,13 +20,13 @@ const initStdioClient = async () => {
   return stdioClient;
 };
 
-const initSseClient = async () => {
-  const sseClient = new Client({
+const initHttpClient = async () => {
+  const httpClient = new Client({
     name: 'blog.marcnuri.com'
   });
-  const transport = new SSEClientTransport(new URL('http://localhost:8080/sse'));
-  await sseClient.connect(transport);
-  return sseClient;
+  const transport = new StreamableHTTPClientTransport(new URL('http://localhost:8080/mcp'));
+  await httpClient.connect(transport);
+  return httpClient;
 };
 
 const assistant = async () => {
@@ -36,16 +36,13 @@ const assistant = async () => {
   const toolList = await stdioClient.listTools();
   toolList.tools.forEach(tool => console.log(` - ${tool.name}: ${tool.description}`));
   if (process.argv.includes('--assistant')) {
-    const model = new ChatOpenAI({
-      configuration: {
-        apiKey: process.env['GITHUB_TOKEN'],
-        baseURL: 'https://models.inference.ai.azure.com',
-      },
-      model: 'gpt-4o-mini',
+    const model = new ChatGoogleGenerativeAI({
+      apiKey: process.env['GOOGLE_API_KEY'],
+      model: 'gemini-2.5-flash',
     });
     const tools = await loadMcpTools('kubernetes-mcp-server', stdioClient);
-    const agent = createReactAgent({
-      llm: model,
+    const agent = createAgent({
+      model,
       tools,
     });
     const listPods = await agent.invoke({
