@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@langchain/mcp-adapters": "1.1.1",
-    "@langchain/core": "1.1.15",
+    "@langchain/core": "1.1.16",
     "@langchain/google-genai": "2.1.10",
     "@modelcontextprotocol/sdk": "1.25.2",
     "langchain": "1.2.10"
