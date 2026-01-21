@@ -34,6 +34,7 @@ jobs:
       - name: Tests
         run: |
           jbang ./connecting-to-mcp-server-with-langchain4j/LangChainMcpClient.java
+          jbang ./java-virtual-threads-project-loom-complete-guide/Test.java
           jbang ./kubernetes-patching-resources-from-java/Test.java
           jbang ./kubernetes-rolling-updates-from-java/Test.java
           cd connecting-to-mcp-server-with-langchainjs && bun install && bun run start && cd -
