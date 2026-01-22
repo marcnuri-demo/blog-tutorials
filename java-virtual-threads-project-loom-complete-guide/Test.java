@@ -1,8 +1,11 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 21+
 //DEPS org.assertj:assertj-core:3.27.6
-//SOURCES ./VirtualThreadsBasics.java
-//SOURCES ./VirtualThreadsHttpClient.java
+//SOURCES ./StartVirtualThread.java
+//SOURCES ./OfVirtualStart.java
+//SOURCES ./VirtualThreadExecutor.java
+//SOURCES ./VirtualThreadFactory.java
+//SOURCES ./ConcurrentHttpClient.java
 //SOURCES ./VirtualThreadsPerformance.java
 
 import java.io.ByteArrayOutputStream;
@@ -13,15 +16,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test script to verify Virtual Threads examples work correctly.
  *
+ * Run with: jbang Test.java
+ *
  * @see https://blog.marcnuri.com/java-virtual-threads-project-loom-complete-guide
  */
 @SuppressWarnings({"CallToPrintStackTrace"})
 public final class Test {
     public static void main(String[] args) {
         try {
-            testVirtualThreadsBasics();
+            testStartVirtualThread();
+            testOfVirtualStart();
+            testVirtualThreadExecutor();
+            testVirtualThreadFactory();
+            testConcurrentHttpClient();
             testVirtualThreadsPerformance();
-            testVirtualThreadsHttpClient();
 
             System.out.println("\n=== All tests passed ===");
             System.exit(0);
@@ -31,41 +39,72 @@ public final class Test {
         }
     }
 
-    private static void testVirtualThreadsBasics() throws Exception {
-        System.out.println("=== Running VirtualThreadsBasics ===\n");
-        String output = captureOutput(() -> VirtualThreadsBasics.main(null));
+    private static void testStartVirtualThread() throws Exception {
+        System.out.println("=== Testing StartVirtualThread ===");
+        String output = captureOutput(() -> StartVirtualThread.main(null));
         System.out.println(output);
 
         assertThat(output)
-            .contains("Method 1: Thread.startVirtualThread()")
-            .contains("Method 2: Thread.ofVirtual().start()")
-            .contains("Method 3: Executors.newVirtualThreadPerTaskExecutor()")
-            .contains("Method 4: ThreadFactory for virtual threads")
-            .contains("Is virtual: true")
-            .contains("All demonstrations completed");
+            .contains("Running in:")
+            .contains("Is virtual: true");
+        System.out.println("PASSED\n");
+    }
+
+    private static void testOfVirtualStart() throws Exception {
+        System.out.println("=== Testing OfVirtualStart ===");
+        String output = captureOutput(() -> OfVirtualStart.main(null));
+        System.out.println(output);
+
+        assertThat(output)
+            .contains("Thread name: my-virtual-thread");
+        System.out.println("PASSED\n");
+    }
+
+    private static void testVirtualThreadExecutor() throws Exception {
+        System.out.println("=== Testing VirtualThreadExecutor ===");
+        String output = captureOutput(() -> VirtualThreadExecutor.main(null));
+        System.out.println(output);
+
+        assertThat(output)
+            .contains("All tasks completed");
+        System.out.println("PASSED\n");
+    }
+
+    private static void testVirtualThreadFactory() throws Exception {
+        System.out.println("=== Testing VirtualThreadFactory ===");
+        String output = captureOutput(() -> VirtualThreadFactory.main(null));
+        System.out.println(output);
+
+        assertThat(output)
+            .contains("worker-");
+        System.out.println("PASSED\n");
+    }
+
+    private static void testConcurrentHttpClient() throws Exception {
+        System.out.println("=== Testing ConcurrentHttpClient ===");
+        String output = captureOutput(() -> ConcurrentHttpClient.main(null));
+        System.out.println(output);
+
+        assertThat(output)
+            .contains("Received")
+            .contains("bytes")
+            .contains("Completed")
+            .contains("requests in");
+        System.out.println("PASSED\n");
     }
 
     private static void testVirtualThreadsPerformance() throws Exception {
-        System.out.println("\n=== Running VirtualThreadsPerformance ===\n");
+        System.out.println("=== Testing VirtualThreadsPerformance ===");
         String output = captureOutput(() -> VirtualThreadsPerformance.main(null));
         System.out.println(output);
 
         assertThat(output)
-            .contains("Virtual Threads vs Platform Threads Performance Benchmark")
-            .contains("Benchmark: Virtual Threads")
-            .contains("Benchmark: Platform Threads")
-            .contains("faster");
-    }
-
-    private static void testVirtualThreadsHttpClient() throws Exception {
-        System.out.println("\n=== Running VirtualThreadsHttpClient ===\n");
-        String output = captureOutput(() -> VirtualThreadsHttpClient.main(null));
-        System.out.println(output);
-
-        assertThat(output)
-            .contains("Virtual Threads HTTP Client")
-            .contains("Fetching")
-            .contains("Total time:");
+            .contains("Virtual Threads vs Platform Threads Benchmark")
+            .contains("Platform Threads (fixed pool of")
+            .contains("Virtual Threads:")
+            .contains("Speedup:")
+            .contains("faster with Virtual Threads");
+        System.out.println("PASSED\n");
     }
 
     private static String captureOutput(ThrowingRunnable runnable) throws Exception {
