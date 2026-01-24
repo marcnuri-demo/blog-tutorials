@@ -2,7 +2,7 @@
 //JAVA 21+
 //DEPS io.fabric8:kubernetes-client:7.5.2
 //DEPS io.fabric8:kube-api-test:7.5.2
-//DEPS org.assertj:assertj-core:3.27.6
+//DEPS org.assertj:assertj-core:3.27.7
 //SOURCES ./JsonPatch.java
 //SOURCES ./JsonMergePatch.java
 //SOURCES ./StrategicMergePatch.java

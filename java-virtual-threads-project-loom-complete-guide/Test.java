@@ -1,6 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 21+
-//DEPS org.assertj:assertj-core:3.27.6
+//DEPS org.assertj:assertj-core:3.27.7
 //SOURCES ./StartVirtualThread.java
 //SOURCES ./OfVirtualStart.java
 //SOURCES ./VirtualThreadExecutor.java
