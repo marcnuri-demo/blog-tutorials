@@ -1,7 +1,7 @@
 /// usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 21+
 //DEPS dev.langchain4j:langchain4j-mcp:1.10.0-beta18
-//DEPS dev.langchain4j:langchain4j-google-ai-gemini:1.10.0
+//DEPS dev.langchain4j:langchain4j-google-ai-gemini:1.11.0
 //DEPS dev.langchain4j:langchain4j-github-models:1.10.0-beta18
 //DEPS org.slf4j:slf4j-simple:2.0.17
 //FILES ./simplelogger.properties
