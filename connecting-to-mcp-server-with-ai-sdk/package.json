@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "3.0.26",
-    "@ai-sdk/mcp": "1.0.18",
+    "@ai-sdk/mcp": "1.0.20",
     "@modelcontextprotocol/sdk": "1.26.0",
     "ai": "6.0.78"
   }
