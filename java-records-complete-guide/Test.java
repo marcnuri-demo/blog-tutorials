@@ -1,7 +1,5 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 17+
-//SOURCES ./RecordBasics.java
-//SOURCES ./RecordConstructors.java
 //SOURCES ./RecordDefensiveCopy.java
 
 /**
@@ -14,16 +12,6 @@
 public class Test {
     public static void main(String[] args) {
         System.out.println("=".repeat(60));
-        System.out.println("Running: RecordBasics");
-        System.out.println("=".repeat(60));
-        RecordBasics.main(null);
-
-        System.out.println("\n" + "=".repeat(60));
-        System.out.println("Running: RecordConstructors");
-        System.out.println("=".repeat(60));
-        RecordConstructors.main(null);
-
-        System.out.println("\n" + "=".repeat(60));
         System.out.println("Running: RecordDefensiveCopy");
         System.out.println("=".repeat(60));
         RecordDefensiveCopy.main(null);
