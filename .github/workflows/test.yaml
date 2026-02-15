@@ -35,6 +35,7 @@ jobs:
         run: |
           jbang ./connecting-to-mcp-server-with-langchain4j/LangChainMcpClient.java
           jbang ./java-records-complete-guide/Test.java
+          jbang ./spring-bean-scopes/Test.java
           jbang ./java-streams-convert-list-into-map/Test.java
           jbang ./java-virtual-threads-project-loom-complete-guide/Test.java
           jbang ./kubernetes-patching-resources-from-java/Test.java
