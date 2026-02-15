@@ -1,6 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 17+
-//DEPS org.springframework:spring-context:6.2.3
+//DEPS org.springframework:spring-context:6.2.16
 //DEPS org.assertj:assertj-core:3.27.7
 //SOURCES ./SingletonVsPrototype.java
 //SOURCES ./PrototypeInSingleton.java
