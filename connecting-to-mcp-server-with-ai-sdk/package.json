@@ -12,6 +12,6 @@
     "@ai-sdk/google": "3.0.54",
     "@ai-sdk/mcp": "1.0.30",
     "@modelcontextprotocol/sdk": "1.29.0",
-    "ai": "6.0.141"
+    "ai": "6.0.142"
   }
 }
