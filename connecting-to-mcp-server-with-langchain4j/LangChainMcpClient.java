@@ -3,7 +3,7 @@
 //DEPS dev.langchain4j:langchain4j-mcp:1.10.0-beta18
 //DEPS dev.langchain4j:langchain4j-google-ai-gemini:1.14.1
 //DEPS dev.langchain4j:langchain4j-github-models:1.10.0-beta18
-//DEPS org.slf4j:slf4j-simple:2.0.17
+//DEPS org.slf4j:slf4j-simple:2.0.18
 //FILES ./simplelogger.properties
 
 import dev.langchain4j.mcp.McpToolProvider;
