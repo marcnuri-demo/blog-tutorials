@@ -6,7 +6,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": "\\.java",
+      "managerFilePatterns": [
+        "/\\.java/"
+      ],
       "matchStrings": [
         "//DEPS (?<depName>\\S+):(\\${\\S+:(?<currentValue>[^ }]+)})",
         "//DEPS ((?<depName>\\S+:\\S+):(?<currentValue>[^$]\\S+))(\\@\\w+)?"
@@ -15,7 +17,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": ".?jbang-catalog.json",
+      "managerFilePatterns": [
+        "/.?jbang-catalog.json/"
+      ],
       "matchStrings": [
         "\"(?<depName>\\S+):(\\${\\S+:(?<currentValue>[^ }]+)})\"",
         "\"((?<depName>\\S+:\\S+):(?<currentValue>[^$]\\S+))(\\@\\w+)?\""
