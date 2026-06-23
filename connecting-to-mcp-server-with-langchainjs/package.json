@@ -13,6 +13,6 @@
     "@langchain/core": "1.2.1",
     "@langchain/google-genai": "2.2.0",
     "@modelcontextprotocol/sdk": "1.29.0",
-    "langchain": "1.5.0"
+    "langchain": "1.5.1"
   }
 }
