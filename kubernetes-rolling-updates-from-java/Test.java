@@ -1,7 +1,7 @@
 /// usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 21+
-//DEPS io.fabric8:kubernetes-client:7.7.0
-//DEPS io.fabric8:kube-api-test:7.7.0
+//DEPS io.fabric8:kubernetes-client:7.8.0
+//DEPS io.fabric8:kube-api-test:7.8.0
 //DEPS org.assertj:assertj-core:3.27.7
 //SOURCES ./DeployNginx.java
 //SOURCES ./PauseNginx.java
