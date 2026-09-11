@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "3.0.44",
-    "@ai-sdk/openai": "4.0.60",
+    "@ai-sdk/openai": "4.0.66",
     "ai": "7.0.93"
   }
 }
