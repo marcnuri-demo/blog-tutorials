@@ -9,7 +9,7 @@
     "start": "bun run index.mjs"
   },
   "dependencies": {
-    "@ai-sdk/google": "4.0.86",
+    "@ai-sdk/google": "4.0.87",
     "@ai-sdk/mcp": "2.0.63",
     "@modelcontextprotocol/sdk": "1.31.0",
     "ai": "7.0.123"
