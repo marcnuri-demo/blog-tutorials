@@ -9,7 +9,7 @@
     "start": "bun run index.mjs"
   },
   "dependencies": {
-    "@langchain/mcp-adapters": "1.1.4",
+    "@langchain/mcp-adapters": "2.0.1",
     "@langchain/core": "1.2.16",
     "@langchain/google-genai": "2.3.2",
     "@modelcontextprotocol/sdk": "1.31.0",
