@@ -1,65 +1,39 @@
-#!/usr/bin/env node
+// LangChain.js MCP Adapters: Connect Agents to MCP Servers
+// https://blog.marcnuri.com/connecting-to-mcp-server-with-langchainjs
+//
+// node index.mjs              connects to the Kubernetes MCP Server, lists its tools and exits
+// node index.mjs --assistant  also runs the agent with a local Ollama model (ollama pull qwen3:4b-instruct)
 import {createAgent} from 'langchain';
-import {ChatGoogleGenerativeAI} from '@langchain/google-genai';
-import {loadMcpTools} from '@langchain/mcp-adapters';
-import {Client} from '@modelcontextprotocol/sdk/client/index.js';
-import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
+import {ChatOllama} from '@langchain/ollama';
+import {MCPAdapter} from '@langchain/mcp-adapters';
 
-const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+const adapter = new MCPAdapter({
+  servers: {
+    kubernetes: {
+      command: 'npx',
+      args: ['-y', 'kubernetes-mcp-server@latest']
+    }
+    // Streamable HTTP alternative (start the server with `npx -y kubernetes-mcp-server@latest --port 8080 --bind-address 127.0.0.1`):
+    // kubernetes: {url: 'http://localhost:8080/mcp'}
+  }
+});
 
-const initStdioClient = async () => {
-  const stdioClient = new Client({
-    name: 'blog.marcnuri.com'
-  });
-  const transport = new StdioClientTransport({
-    command: npx,
-    args: ['-y', 'kubernetes-mcp-server@latest']
-  });
-  await stdioClient.connect(transport);
-  return stdioClient;
-};
-
-const initHttpClient = async () => {
-  const httpClient = new Client({
-    name: 'blog.marcnuri.com'
-  });
-  const transport = new StreamableHTTPClientTransport(new URL('http://localhost:8080/mcp'));
-  await httpClient.connect(transport);
-  return httpClient;
-};
-
-const assistant = async () => {
-  console.log('Starting kubernetes-mcp-server in STDIO mode');
-  const stdioClient = await initStdioClient();
-  console.log('Available tools:');
-  const toolList = await stdioClient.listTools();
-  toolList.tools.forEach(tool => console.log(` - ${tool.name}: ${tool.description}`));
+try {
+  const tools = await adapter.listTools();
+  console.log(`Loaded ${tools.length} tools: ${tools.map(tool => tool.name).join(', ')}`);
   if (process.argv.includes('--assistant')) {
-    const model = new ChatGoogleGenerativeAI({
-      apiKey: process.env['GOOGLE_API_KEY'],
-      model: 'gemini-2.5-flash',
-    });
-    const tools = await loadMcpTools('kubernetes-mcp-server', stdioClient);
     const agent = createAgent({
-      model,
-      tools,
+      model: new ChatOllama({model: 'qwen3:4b-instruct'}),
+      tools
     });
     const listPods = await agent.invoke({
-      messages:[{
+      messages: [{
         role: 'user',
-        content: 'List all pods in my cluster and output as markdown table'
+        content: 'List all pods in my cluster and output their name and namespace as a Markdown table'
       }]
     });
-    console.log(listPods.messages.slice(-1)[0].content);
+    console.log(listPods.messages.at(-1).text);
   }
-  await stdioClient.close();
-};
-
-assistant()
-  .then(() => {
-    console.log('done');
-  })
-  .catch(err => {
-    console.error('Error:', err);
-  });
+} finally {
+  await adapter.close();
+}

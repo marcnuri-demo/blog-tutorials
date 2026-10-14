@@ -1,9 +1,8 @@
 /// usr/bin/env jbang "$0" "$@" ; exit $?
-//JAVA 21+
-//DEPS dev.langchain4j:langchain4j-mcp:1.10.0-beta18
-//DEPS dev.langchain4j:langchain4j-google-ai-gemini:1.22.0
-//DEPS dev.langchain4j:langchain4j-github-models:1.10.0-beta18
-//DEPS org.slf4j:slf4j-simple:2.0.20
+//JAVA 17+
+//DEPS dev.langchain4j:langchain4j-mcp:1.22.0-beta32
+//DEPS dev.langchain4j:langchain4j-ollama:1.22.0
+//DEPS org.slf4j:slf4j-simple:2.0.17
 //FILES ./simplelogger.properties
 
 import dev.langchain4j.mcp.McpToolProvider;
@@ -11,155 +10,112 @@ import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.McpClient;
 import dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport;
 import dev.langchain4j.mcp.client.transport.stdio.StdioMcpTransport;
-import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.tool.ToolArgumentsErrorHandler;
+import dev.langchain4j.service.tool.ToolExecutionErrorHandler;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.List;
 
-// Run with the following command
-// GITHUB_TOKEN=ghp_YOUR_TOKEN jbang ./LangChainMcpClient.java
-// Or with the following command to start the assistant integration example (you need a Kubernetes cluster .kube/context)
-// GITHUB_TOKEN=ghp_YOUR_TOKEN jbang ./LangChainMcpClient.java --assistant
+// Lists the tools of the Kubernetes MCP Server over STDIO and over Streamable HTTP:
+//   jbang ./LangChainMcpClient.java
+// Runs the assistant example with a local Ollama model (ollama pull qwen3:4b-instruct)
+// against the cluster of your current kubeconfig context:
+//   jbang ./LangChainMcpClient.java --assistant
 public final class LangChainMcpClient {
 
   private static final String NPX = System.getProperty("os.name").toLowerCase().contains("win") ? "npx.cmd" : "npx";
 
-  private static McpClient initStdioClient(String... command) {
-    return new DefaultMcpClient.Builder()
+  static McpClient initStdioClient(String... command) {
+    return DefaultMcpClient.builder()
       // Optional client name to identify with the server, defaults to "langchain4j"
       .clientName("blog.marcnuri.com")
-      // Optional MCP Protocol version, defaults to 2025-11-25
-      .protocolVersion("2025-11-25")
       // Optional timeout for each individual tool execution, defaults to 60 seconds
-      .toolExecutionTimeout(Duration.ofSeconds(10))
-      // STDIO transport
-      .transport(new StdioMcpTransport.Builder()
-        // The command to execute the MCP server
-        .command(Arrays.asList(command))
-        // Optional, should the MCP server communication events be logged to the logger
-        // Check simplelogger.properties to enable output to the console
+      .toolExecutionTimeout(Duration.ofSeconds(30))
+      .transport(StdioMcpTransport.builder()
+        // The command that starts the MCP server
+        .command(List.of(command))
+        // Optional, log the MCP messages (DEBUG level of the "MCP" logger)
         .logEvents(true)
         .build())
       .build();
   }
 
-  private static McpClient initHttpClient(String httpUrl) {
-    return new DefaultMcpClient.Builder()
-      // Optional client name to identify with the server, defaults to "langchain4j"
+  static McpClient initHttpClient(String url) {
+    return DefaultMcpClient.builder()
       .clientName("blog.marcnuri.com")
-      // Optional MCP Protocol version, defaults to 2025-11-25
+      .toolExecutionTimeout(Duration.ofSeconds(30))
+      // Skip protocol detection: over HTTP, the Kubernetes MCP Server speaks 2026-07-28 only with --stateless
       .protocolVersion("2025-11-25")
-      // Optional timeout for each individual tool execution, defaults to 60 seconds
-      .toolExecutionTimeout(Duration.ofSeconds(10))
-      // Streamable HTTP transport (replaces deprecated SSE transport)
-      .transport(new StreamableHttpMcpTransport.Builder()
-        // The URL to connect to the MCP server
-        .url(httpUrl)
-        // Optional, should the MCP server requests be logged to the logger
-        // Check simplelogger.properties to enable output to the console
+      .transport(StreamableHttpMcpTransport.builder()
+        // The URL of the MCP server's endpoint
+        .url(url)
+        // Optional, log the MCP requests and responses (INFO level of the "MCP" logger)
         .logRequests(true)
-        // Optional, should the MCP server responses be logged to the logger
-        // Check simplelogger.properties to enable output to the console
         .logResponses(true)
         .build())
       .build();
   }
 
-  public static void main(String[] args) {
-    try {
-      checkRequirements();
-      System.out.println("Starting kubernetes-mcp-server in STDIO mode...");
-      try (var stdioClient = initStdioClient(NPX, "-y", "kubernetes-mcp-server@latest")) {
-        System.out.println("Available tools:");
-        stdioClient.listTools().stream()
-          .map(t -> " - " + t.name())
-          .forEach(System.out::println);
-        if (args.length > 0 && args[0].equals("--assistant")) {
-          final var assistant = assistantIntegrationExample(stdioClient);
-          System.out.println(assistant.chat("Run a Pod with the image marcnuri/chuck-norris and expose port 8080"));
-          System.out.println(assistant.chat("List the Pods running in my cluster as a markdown table"));
-        }
-      }
-      System.out.println("Starting kubernetes-mcp-server in HTTP mode...");
-      // Start the MCP server in a separate process
-      final var process = new ProcessBuilder(NPX, "-y", "kubernetes-mcp-server@latest", "--port=8080")
-        .inheritIO()
-        .start();
-      waitForPort("localhost", 8080, Duration.ofSeconds(10));
-      try (var httpClient = initHttpClient("http://localhost:8080/mcp")) {
-        System.out.println("Available tools:");
-        httpClient.listTools().stream()
-          .map(t -> " - " + t.name())
-          .forEach(System.out::println);
-      } finally {
-        killProcess(ProcessHandle.of(process.pid()).orElseThrow());
-      }
-    } catch (Exception e) {
-      System.err.println("LangChain MCP Client failed: " + e.getMessage());
-    }
-  }
-
-  private interface Assistant {
+  interface Assistant {
     String chat(String userMessage);
   }
 
-  private static Assistant assistantIntegrationExample(McpClient client) {
+  static Assistant assistant(McpClient client) {
     return AiServices.builder(Assistant.class)
-      // A bug in Google's API server prevents the use of the GoogleAiGeminiChatModel with tools
-      // --* GenerateContentRequest.tools[0].function_declarations[0].parameters.properties[params].properties: should be non-empty for OBJECT type--
-      .chatModel(GoogleAiGeminiChatModel.builder()
-        .apiKey(System.getenv("GOOGLE_API_KEY"))
-        .modelName("gemini-2.5-flash")
+      .chatModel(OllamaChatModel.builder()
+        .baseUrl("http://localhost:11434")
+        .modelName("qwen3:4b-instruct")
+        .timeout(Duration.ofMinutes(5))
         .build())
-//      .chatModel(GitHubModelsChatModel.builder()
-//        .gitHubToken(System.getenv("GITHUB_TOKEN"))
-//        .modelName("gpt-4o-mini")
-//        .build())
       .toolProvider(McpToolProvider.builder().mcpClients(client).build())
+      .toolArgumentsErrorHandler(ToolArgumentsErrorHandler.sendExceptionMessageToLlm())
+      .toolExecutionErrorHandler(ToolExecutionErrorHandler.failInvocationUnlessVisibleToLlm())
       .build();
   }
 
-  private static void checkRequirements() {
-    // Check if npx is available by running npx --version
+  public static void main(String[] args) throws Exception {
+    System.out.println("Starting the Kubernetes MCP Server over STDIO...");
+    try (var client = initStdioClient(NPX, "-y", "kubernetes-mcp-server@latest")) {
+      if (args.length > 0 && args[0].equals("--assistant")) {
+        final var assistant = assistant(client);
+        System.out.println(assistant.chat("Run a Pod with the image marcnuri/chuck-norris and expose port 8080"));
+        System.out.println(assistant.chat("List all pods in my cluster and output their name and namespace as a Markdown table"));
+        return;
+      }
+      System.out.println("Available tools:");
+      client.listTools().forEach(t -> System.out.println(" - " + t.name()));
+    }
+    System.out.println("Starting the Kubernetes MCP Server over Streamable HTTP...");
+    final var server = new ProcessBuilder(NPX, "-y", "kubernetes-mcp-server@latest", "--port", "8080", "--bind-address", "127.0.0.1")
+      .inheritIO()
+      .start();
     try {
-      new ProcessBuilder(NPX, "--version").start().waitFor();
-    } catch (Exception e) {
-      throw new RuntimeException("npx is required to run the LangChain MCP server");
+      waitForPort("127.0.0.1", 8080, Duration.ofSeconds(60));
+      try (var client = initHttpClient("http://127.0.0.1:8080/mcp")) {
+        System.out.println("Available tools:");
+        client.listTools().forEach(t -> System.out.println(" - " + t.name()));
+      }
+    } finally {
+      // npx starts the server as a child process: stop it too
+      server.descendants().forEach(ProcessHandle::destroy);
+      server.destroy();
     }
   }
 
   private static void waitForPort(String host, int port, Duration timeout) throws InterruptedException {
-    long start = System.currentTimeMillis();
-    while (System.currentTimeMillis() - start < timeout.toMillis()) {
-      try (Socket socket = new Socket()) {
+    final long deadline = System.currentTimeMillis() + timeout.toMillis();
+    while (System.currentTimeMillis() < deadline) {
+      try (var socket = new Socket()) {
         socket.connect(new InetSocketAddress(host, port), 1000);
         return;
       } catch (Exception e) {
-        Thread.sleep(100);
+        Thread.sleep(200);
       }
     }
-    throw new RuntimeException("Timeout waiting for port " + port);
-  }
-
-  private static void killProcess(ProcessHandle process) {
-    process.children().forEach(LangChainMcpClient::killProcess);
-    process.destroyForcibly();
-    try {
-      if (System.getProperty("os.name").toLowerCase().contains("win")) {
-        Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", "" + process.pid()});
-      } else {
-        Runtime.getRuntime().exec(new String[]{"kill", "-9 ", "" + process.pid()});
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    throw new IllegalStateException("Timeout waiting for port " + port);
   }
 }
-
-
-
-
