@@ -2,7 +2,7 @@
 //JAVA 17+
 //DEPS dev.langchain4j:langchain4j-mcp:1.22.0-beta32
 //DEPS dev.langchain4j:langchain4j-ollama:1.22.0
-//DEPS org.slf4j:slf4j-simple:2.0.17
+//DEPS org.slf4j:slf4j-simple:2.0.20
 //FILES ./simplelogger.properties
 
 import dev.langchain4j.mcp.McpToolProvider;
