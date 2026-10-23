@@ -13,7 +13,8 @@ const adapter = new MCPAdapter({
       command: 'npx',
       args: ['-y', 'kubernetes-mcp-server@latest']
     }
-    // Streamable HTTP alternative (start the server with `npx -y kubernetes-mcp-server@latest --port 8080 --bind-address 127.0.0.1`):
+    // Streamable HTTP alternative (start the server with `npx -y kubernetes-mcp-server@latest --config config.toml`,
+    // where config.toml contains `port = "8080"` and `bind_address = "127.0.0.1"`):
     // kubernetes: {url: 'http://localhost:8080/mcp'}
   }
 });
