@@ -17,6 +17,7 @@ import dev.langchain4j.service.tool.ToolExecutionErrorHandler;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public final class LangChainMcpClient {
     return DefaultMcpClient.builder()
       .clientName("blog.marcnuri.com")
       .toolExecutionTimeout(Duration.ofSeconds(30))
-      // Skip protocol detection: over HTTP, the Kubernetes MCP Server speaks 2026-07-28 only with --stateless
+      // Skip protocol detection: over HTTP, the Kubernetes MCP Server speaks 2026-07-28 only with stateless = true
       .protocolVersion("2025-11-25")
       .transport(StreamableHttpMcpTransport.builder()
         // The URL of the MCP server's endpoint
@@ -90,7 +91,11 @@ public final class LangChainMcpClient {
       client.listTools().forEach(t -> System.out.println(" - " + t.name()));
     }
     System.out.println("Starting the Kubernetes MCP Server over Streamable HTTP...");
-    final var server = new ProcessBuilder(NPX, "-y", "kubernetes-mcp-server@latest", "--port", "8080", "--bind-address", "127.0.0.1")
+    // HTTP mode is only configurable through a TOML file (no --port / --bind-address flags)
+    final var config = Files.createTempFile("kubernetes-mcp-server", ".toml");
+    config.toFile().deleteOnExit();
+    Files.writeString(config, "port = \"8080\"\nbind_address = \"127.0.0.1\"\n");
+    final var server = new ProcessBuilder(NPX, "-y", "kubernetes-mcp-server@latest", "--config", config.toString())
       .inheritIO()
       .start();
     try {
