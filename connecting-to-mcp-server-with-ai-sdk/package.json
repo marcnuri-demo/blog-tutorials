@@ -14,7 +14,7 @@
   "dependencies": {
     "@ai-sdk/mcp": "2.0.84",
     "@modelcontextprotocol/client": "2.4.0",
-    "ai": "7.0.152",
+    "ai": "7.0.153",
     "ollama-ai-provider-v2": "4.1.0"
   }
 }
