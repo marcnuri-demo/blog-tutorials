@@ -12,7 +12,7 @@
     "start": "node index.mjs"
   },
   "dependencies": {
-    "@ai-sdk/mcp": "2.0.83",
+    "@ai-sdk/mcp": "2.0.84",
     "@modelcontextprotocol/client": "2.4.0",
     "ai": "7.0.152",
     "ollama-ai-provider-v2": "4.1.0"
