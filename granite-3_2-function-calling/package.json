@@ -11,6 +11,6 @@
   "dependencies": {
     "@ai-sdk/openai-compatible": "3.0.86",
     "@ai-sdk/openai": "4.0.110",
-    "ai": "7.0.163"
+    "ai": "7.0.164"
   }
 }
